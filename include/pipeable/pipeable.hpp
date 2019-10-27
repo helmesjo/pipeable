@@ -20,7 +20,7 @@ namespace pipeable
     });
 
     /* VISITOR */
-    inline const auto visitor = assembly::make_interceptor(
+    inline const auto visit = assembly::make_interceptor(
         [](auto&& downstream, auto&& variant)
     {
         std::visit(std::forward<decltype(downstream)>(downstream), std::forward<decltype(variant)>(variant));
@@ -36,6 +36,10 @@ namespace pipeable
         }
     });
 
+    /*
+    Chain callables. Result from left-hand callable gets passed as input to right-hand callable.
+    Invoke by piping valid invocable input to left-most callable.
+    */
     template<typename lhs_t, typename rhs_t>
     constexpr decltype(auto) operator>>=(lhs_t&& lhs, rhs_t&& rhs)
     {

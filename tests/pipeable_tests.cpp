@@ -598,7 +598,7 @@ SCENARIO("built in pipeline interceptors")
             }
         }
     }
-    GIVEN("a pipeline composed as: variant<x, y, z>  >>=  visitor  >>=  receiver")
+    GIVEN("a pipeline composed as: variant<x, y, z>  >>=  visit  >>=  receiver")
     {
         struct
         {
@@ -610,7 +610,7 @@ SCENARIO("built in pipeline interceptors")
             void operator()(std::string val) { receivedStr = val; }
         } receiver;
 
-        auto pipeline = visitor >>= &receiver;
+        auto pipeline = visit >>= &receiver;
 
         WHEN("a variant of multiple types is piped, once while containing each time")
         {
