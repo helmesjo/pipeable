@@ -41,8 +41,8 @@ add_executable( pipeable_tests
 	"tests/generator_tests.cpp"
 )
 target_link_libraries( pipeable_tests
+    pipeable
     catch2
-    fho::pipeable
 )
 add_test(
     NAME pipeable_tests
