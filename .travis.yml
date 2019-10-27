@@ -1,19 +1,37 @@
+env:
+   global:
+     - CONAN_DOCKER_IMAGE: conanio/clang60
+     - CONAN_LOGIN_USERNAME: helmesjo
+     - #CONAN_PASSWORD: <specify-in-ci-server>
+     - REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
+
 linux: &linux
    os: linux
-   dist: bionic
+   sudo: required
    language: python
-   python: "3.7"
+   python: "3.6"
    services:
      - docker
+osx: &osx
+   os: osx
+   language: generic
 matrix:
    include:
       - <<: *linux
-        env: >
-          CONAN_CLANG_VERSIONS=6.0
-          CONAN_DOCKER_IMAGE=conanio/clang60
-          CONAN_LOGIN_USERNAME=helmesjo
-          #CONAN_PASSWORD=<specify-in-ci-server>
-          REMOTE_REPO="https://api.bintray.com/conan/helmesjo/public-conan"
+        env: CONAN_GCC_VERSIONS=7 CONAN_DOCKER_IMAGE=conanio/gcc7
+      - <<: *linux
+        env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=5.0 CONAN_DOCKER_IMAGE=conanio/clang50
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=6.0 CONAN_DOCKER_IMAGE=conanio/clang60
+      - <<: *osx
+        osx_image: xcode9
+        env: CONAN_APPLE_CLANG_VERSIONS=9.0
+      - <<: *osx
+        osx_image: xcode9.3
+        env: CONAN_APPLE_CLANG_VERSIONS=9.1
+
 script:
   - mkdir build
   - cd build
