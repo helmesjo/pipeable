@@ -1,0 +1,27 @@
+linux: &linux
+   os: linux
+   dist: bionic
+   language: python
+   python: "3.7"
+   services:
+     - docker
+matrix:
+   include:
+      - <<: *linux
+        env: >
+          CONAN_CLANG_VERSIONS=6.0
+          CONAN_DOCKER_IMAGE=conanio/clang60
+          CONAN_LOGIN_USERNAME=helmesjo
+          #CONAN_PASSWORD=<specify-in-ci-server>
+          REMOTE_REPO="https://api.bintray.com/conan/helmesjo/public-conan"
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - cmake --build .
+  - ctest
+  - cd ..
+  - pip install conan --upgrade
+  - conan create . helmesjo/stable
+  - conan remote add repo $REMOTE_REPO
+  - conan upload "*" -r repo --confirm
