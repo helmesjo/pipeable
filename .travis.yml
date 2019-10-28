@@ -34,14 +34,14 @@ matrix:
         osx_image: xcode11.2
         env: CONAN_APPLE_CLANG_VERSIONS=11.0
 
-script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - cmake --build .
-  - ctest
-  - cd ..
-  - pip install conan --upgrade
-  - conan create . helmesjo/stable
-  - conan remote add repo $REMOTE_REPO
-  - conan upload "*" -r repo --confirm
+script: >
+  mkdir build &&
+  cd build &&
+  cmake .. &&
+  cmake --build . &&
+  ctest &&
+  cd .. &&
+  pip install conan --upgrade &&
+  conan create . helmesjo/stable &&
+  conan remote add repo $REMOTE_REPO &&
+  conan upload "*" -r repo --confirm
