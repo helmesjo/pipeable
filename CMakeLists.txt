@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 
+# Fix behavior of CMAKE_CXX_STANDARD when targeting macOS.
+if (POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif ()
+
 project(pipeable)
 
 add_library( ${PROJECT_NAME} INTERFACE)
@@ -36,6 +41,11 @@ enable_testing()
 
 add_subdirectory(catch2)
 
+# 'cxx_std_17' above is not biting on AppleClang, so be explicit in this case.
+# See: https://gitlab.kitware.com/cmake/cmake/issues/15943
+if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    add_compile_options(-std=c++17)
+endif()
 add_executable( pipeable_tests
     "tests/pipeable_tests.cpp"
     "tests/generator_tests.cpp"
