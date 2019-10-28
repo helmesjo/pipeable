@@ -30,12 +30,7 @@ install: >
   pip install conan --upgrade
 
 script: >
-  mkdir build &&
-  cd build &&
-  cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .. &&
-  cmake --build . &&
-  ctest &&
-  cd .. &&
+  ./build.sh &&
   conan create . helmesjo/stable &&
   conan remote add repo $REMOTE_REPO &&
   conan upload "*" -r repo --confirm
