@@ -8,7 +8,7 @@ A small library I needed that others might find useful.
 > _I don't know functional programming, so I probably bring a pretty poor name-game._
 > _Got better names at hand? I gladly accept feedback!_
 ### TL;DR:
-```
+```c++
 #include <pipeable/pipeable.hpp>
 // ...
 
@@ -19,6 +19,7 @@ struct extract_number
 {
   int operator()(string input){ ... }
 };
+
 struct number_plus
 {
   int operator()(int input){ ... }
@@ -38,7 +39,7 @@ _A special callable capable of "intercepting" the invocation chain and inject cu
 _As first argument it will receive a callable representing the downstream pipeline (to be invoked by the interceptor)._
 
 **for_each** example:
-```
+```c++
 // Pass lambda to "make_interceptor" with first argument as generic. Rest is desired input
 auto for_each = pipeable::assembly::make_interceptor(
   [](auto&& downstream, const vector& values){
