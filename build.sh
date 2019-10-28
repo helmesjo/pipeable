@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function on_error {
+    echo "Build failed..."
+    exit 1
+}
+trap on_error ERR
+
 BUILD_DIR=build
 CONFIG=Release
 
