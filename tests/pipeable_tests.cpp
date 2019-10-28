@@ -6,22 +6,29 @@
 #include <functional>
 #include <optional>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <variant>
 
 using namespace pipeable;
 using pipeable::operator>>=;
 
-using a_clock_t = std::chrono::system_clock;
+using a_clock_t = std::chrono::high_resolution_clock;
 using time_point_t = std::chrono::time_point<a_clock_t, std::chrono::nanoseconds>;
 
 namespace
 {
+    inline void dummy_sleep()
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds{1});
+    }
+
     struct int_to_int
     {
         int operator()(int val)
         {
             callTime = a_clock_t::now();
+            dummy_sleep();
             return val;
         }
 
@@ -32,6 +39,7 @@ namespace
         std::string operator()(int val)
         {
             callTime = a_clock_t::now();
+            dummy_sleep();
             return std::to_string(val);
         }
         time_point_t callTime;
@@ -41,6 +49,7 @@ namespace
         const char* operator()(std::string val)
         {
             callTime = a_clock_t::now();
+            dummy_sleep();
             return (val_ = val).c_str();
         }
         time_point_t callTime;
@@ -53,6 +62,7 @@ namespace
         int operator()(const char* val)
         {
             callTime = a_clock_t::now();
+            dummy_sleep();
             return std::stoi(std::string(val));
         }
         time_point_t callTime;
