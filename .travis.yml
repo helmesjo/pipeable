@@ -22,11 +22,12 @@ matrix:
       - <<: *linux
         env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=7.0 CONAN_DOCKER_IMAGE=conanio/clang70
-      - <<: *linux
         env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9
+
+install: >
+  pip install conan --upgrade
 
 script: >
   mkdir build &&
@@ -35,7 +36,6 @@ script: >
   cmake --build . &&
   ctest &&
   cd .. &&
-  pip install conan --upgrade &&
   conan create . helmesjo/stable &&
   conan remote add repo $REMOTE_REPO &&
   conan upload "*" -r repo --confirm

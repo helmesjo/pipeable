@@ -1,0 +1,31 @@
+environment:
+  PYTHON_HOME: "C:\\Python37"
+  CONAN_DOCKER_IMAGE: conanio/clang60
+  CONAN_LOGIN_USERNAME: helmesjo
+  #CONAN_PASSWORD: <specify-in-ci-server>
+  REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
+
+  matrix:
+    - BUILD_TYPE: cmake
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONAN_VISUAL_VERSIONS: 15
+    - BUILD_TYPE: cmake
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      CONAN_VISUAL_VERSIONS: 16
+
+install:
+  - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
+  - pip.exe install conan --upgrade
+
+build_script: >
+  mkdir build &&
+  cd build &&
+  cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .. &&
+  cmake --build . &&
+  ctest &&
+  cd .. &&
+  conan create . helmesjo/stable &&
+  conan remote add repo $REMOTE_REPO &&
+  conan upload "*" -r repo --confirm
+
+deploy: off
