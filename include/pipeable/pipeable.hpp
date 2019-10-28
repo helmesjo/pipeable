@@ -26,11 +26,18 @@ namespace pipeable
         std::visit(std::forward<decltype(downstream)>(downstream), std::forward<decltype(variant)>(variant));
     });
 
+    /* UNPACK */
+    inline const auto unpack = assembly::make_interceptor(
+        [](auto&& downstream, auto&& tuple)
+    {
+        std::apply(std::forward<decltype(downstream)>(downstream), std::forward<decltype(tuple)>(tuple));
+    });
+
     /* MAYBE */
     inline const auto maybe = assembly::make_interceptor(
         [](auto&& downstream, auto&& optional)
     {
-        if (optional.has_value())
+        if (optional)
         {
             std::forward<decltype(downstream)>(downstream)(*optional);
         }

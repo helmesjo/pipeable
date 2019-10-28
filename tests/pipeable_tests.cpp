@@ -677,4 +677,37 @@ SCENARIO("built in pipeline interceptors")
             }
         }
     }
+    GIVEN("a pipeline composed as: tuple<x, y, z>  >>=  unpack  >>=  receiver")
+    {
+        struct
+        {
+            bool wasCalled = false;
+            int receivedInt = 0;
+            std::string receivedString = "";
+            float receivedFloat = 0.0f;
+            void operator()(int val1, std::string val2, float val3)
+            {
+                receivedInt = val1;
+                receivedString = val2;
+                receivedFloat = val3;
+                wasCalled = true;
+            }
+        } receiver;
+
+        auto pipeline = unpack >>= &receiver;
+
+        WHEN("a tuple is piped")
+        {
+            auto input = std::tuple(int(1), std::string("hello"), float(4.5f));
+            input >>= pipeline;
+
+            THEN("receiver is invoked with tuple unpacked as individual arguments")
+            {
+                REQUIRE(receiver.wasCalled == true);
+                REQUIRE(receiver.receivedInt == 1);
+                REQUIRE(receiver.receivedString == "hello");
+                REQUIRE(receiver.receivedFloat == 4.5f);
+            }
+        }
+    }
 }
