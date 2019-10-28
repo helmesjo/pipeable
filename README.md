@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/helmesjo/pipeable.svg?branch=master)](https://travis-ci.org/helmesjo/pipeable)
-
+[![Linux & macOS](https://travis-ci.org/helmesjo/pipeable.svg?branch=master)](https://travis-ci.org/helmesjo/pipeable)
+[![Windows](https://ci.appveyor.com/api/projects/status/f9vbeaxd8f2tq2hq?svg=true)](https://ci.appveyor.com/project/helmesjo/pipeable)
 
 # pipeable
 Just want to invoke some callable object, take the result and forward to another callable, and another, and another..?
