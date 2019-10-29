@@ -1,6 +1,5 @@
 environment:
   PYTHON_HOME: "C:\\Python37"
-  CONAN_DOCKER_IMAGE: conanio/clang60
   CONAN_LOGIN_USERNAME: helmesjo
   #CONAN_PASSWORD: <specify-in-ci-server>
   REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"

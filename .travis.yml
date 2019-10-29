@@ -1,6 +1,5 @@
 env:
    global:
-     - CONAN_DOCKER_IMAGE: conanio/clang60
      - CONAN_LOGIN_USERNAME: helmesjo
      - #CONAN_PASSWORD: <specify-in-ci-server>
      - REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
@@ -18,19 +17,17 @@ osx: &osx
 matrix:
    include:
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
+        env: CONAN_DOCKER_IMAGE=conanio/gcc8
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9
+        env: CONAN_DOCKER_IMAGE=conanio/gcc9
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8
+        env: CONAN_DOCKER_IMAGE=conanio/clang8
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9
-
-install: >
-  pip install conan --upgrade
+        env: CONAN_DOCKER_IMAGE=conanio/clang9
 
 script: >
-  ./build.sh &&
+  docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
+  "./build.sh &&
   conan create . helmesjo/stable &&
   conan remote add repo $REMOTE_REPO &&
-  conan upload "*" -r repo --confirm
+  conan upload '*' -r repo --confirm"
