@@ -60,7 +60,7 @@ SCENARIO("Compose pipeline stages with first stage generating data")
     {
         THEN("it is iterable")
         {
-            REQUIRE(fho::type::is_iterable_v<generator<int>>);
+            REQUIRE(pipeable::type::is_iterable_v<generator<int>>);
         }
 
         my_generator<int> myGenerator = { 1, 2, 3 };

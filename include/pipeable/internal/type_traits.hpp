@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace fho::type
+namespace pipeable::type
 {
     namespace details
     {

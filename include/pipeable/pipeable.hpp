@@ -10,7 +10,7 @@ namespace pipeable
     inline const auto for_each = assembly::make_interceptor(
         [](auto&& downstream, auto&& iterable)
     {
-        static_assert(fho::type::is_iterable_v<decltype(iterable)>, "for_each requires iterable input.");
+        static_assert(pipeable::type::is_iterable_v<decltype(iterable)>, "for_each requires iterable input.");
         // Iterate with universal reference, and perfectly forward to downstream pipeline
         for(auto&& elem : iterable)
         {
@@ -50,7 +50,7 @@ namespace pipeable
     template<typename lhs_t, typename rhs_t>
     constexpr decltype(auto) operator>>=(lhs_t&& lhs, rhs_t&& rhs)
     {
-        if constexpr (meta::is_invocable_v<decltype(rhs), decltype(lhs)>)
+        if constexpr (meta::is_invocable_v<rhs_t, lhs_t>)
         {
             return invocation::invoke(std::forward<rhs_t>(rhs), std::forward<lhs_t>(lhs));
         }
