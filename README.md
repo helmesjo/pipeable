@@ -61,7 +61,7 @@ vector{1, 2, 3} >>= for_each >>= print_to_stdout();
 - **[for_each](https://github.com/helmesjo/pipeable/blob/bbe78f033b8b22779e4e371f8c18ef58e9ad7550/include/pipeable/pipeable.hpp#L9-L20)**: Iterate left-hand iterable and forward each individual value to downstream.
 - **[visit](https://github.com/helmesjo/pipeable/blob/bbe78f033b8b22779e4e371f8c18ef58e9ad7550/include/pipeable/pipeable.hpp#L22-L27)**: Apply the visitor pattorn (std::visit) to left-hand std::variant<...> and invoke on downstream.
 - **[unpack](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L29-L34)**: Unpack left-hand tuple and pass elements as individual arguments to downstream.
-- **[maybe](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L36-L44)**: Forward left-hand std::optional<T> value to downstream if it exists, else do nothing.
+- **[maybe](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L36-L44)**: Forward left-hand optional value to downstream if it exists, else do nothing.
 
 ## Build & Install
 1. `mkdir build && cd build`
