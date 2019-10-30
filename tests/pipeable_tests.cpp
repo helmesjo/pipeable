@@ -506,10 +506,10 @@ SCENARIO("Invoke composed callables")
     }
     GIVEN("a parameterless callable returning value")
     {
-        auto return_one = []() -> int { return 2; };
+        auto return_two = []() -> int { return 2; };
         WHEN("piped to pipeline accepting input of returned type")
         {
-            std::string result = return_one >>= int_to_string();
+            std::string result = return_two >>= int_to_string();
             THEN("it is invoked and result forwarded to downstream pipeline")
             {
                 REQUIRE(result == "2");
