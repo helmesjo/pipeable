@@ -47,7 +47,8 @@ namespace pipeable
     Chain callables. Result from left-hand callable gets passed as input to right-hand callable.
     Invoke by piping valid invocable input to left-most callable.
     */
-    template<typename lhs_t, typename rhs_t>
+    template<typename lhs_t, typename rhs_t,
+        concepts::IsNotCustomPipeable<lhs_t> = nullptr>
     constexpr decltype(auto) operator>>=(lhs_t&& lhs, rhs_t&& rhs)
     {
         if constexpr (meta::is_invocable_v<rhs_t, lhs_t>)

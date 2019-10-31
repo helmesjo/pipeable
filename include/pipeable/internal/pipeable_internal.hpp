@@ -18,6 +18,8 @@ namespace pipeable
             void operator()(T&&) const;
         };
 
+        struct custom_pipeable_tag {};
+
         struct pipe_interceptor_tag {};
     }
 
@@ -25,6 +27,9 @@ namespace pipeable
     {
         template<typename... Ts>
         constexpr bool is_pipe_v = (std::is_base_of_v<impl::pipe_tag, std::decay_t<Ts>> && ...);
+
+        template<typename... Ts>
+        constexpr bool is_custom_pipeable_v = (std::is_base_of_v<impl::custom_pipeable_tag, std::decay_t<Ts>> && ...);
 
         template<typename... Ts>
         constexpr bool is_interceptor_v = (std::is_base_of_v<impl::pipe_interceptor_tag, std::decay_t<Ts>> && ...);
@@ -47,11 +52,17 @@ namespace pipeable
         template<typename... Ts>
         using IsNotPipe = std::enable_if_t<!meta::is_pipe_v<Ts...>, details::tag_t<1>>;
 
+        template<typename... Ts>
+        using IsCustomPipeable = std::enable_if_t<meta::is_custom_pipeable_v<Ts...>, details::tag_t<2>>;
+
+        template<typename... Ts>
+        using IsNotCustomPipeable = std::enable_if_t<!meta::is_custom_pipeable_v<Ts...>, details::tag_t<3>>;
+
         template<typename interceptor_t>
-        using IsInterceptor = std::enable_if_t<meta::is_interceptor_v<interceptor_t>, details::tag_t<3>>;
+        using IsInterceptor = std::enable_if_t<meta::is_interceptor_v<interceptor_t>, details::tag_t<4>>;
 
         template<typename T>
-        using IsNotInterceptor = std::enable_if_t<!meta::is_interceptor_v<T>, details::tag_t<4>>;
+        using IsNotInterceptor = std::enable_if_t<!meta::is_interceptor_v<T>, details::tag_t<5>>;
     }
 
     namespace impl

@@ -39,6 +39,7 @@ add_subdirectory(catch2)
 add_executable( pipeable_tests
     "tests/pipeable_tests.cpp"
     "tests/data_source_tests.cpp"
+    "tests/data_generator_tests.cpp"
 )
 target_link_libraries( pipeable_tests
     pipeable
