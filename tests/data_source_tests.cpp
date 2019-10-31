@@ -1,5 +1,5 @@
 #include <pipeable/pipeable.hpp>
-#include <pipeable/generator.hpp>
+#include <pipeable/data_source.hpp>
 
 #include <catch2/catch.hpp>
 #include <type_traits>
@@ -13,9 +13,9 @@ using time_point_t = std::chrono::time_point<a_clock_t>;
 namespace
 {
     template<typename T>
-    struct my_generator final : public generator<T>
+    struct my_source final : public data_source<T>
     {
-        my_generator(std::initializer_list<T> vals) :
+        my_source(std::initializer_list<T> vals) :
             vals_(vals.begin(), vals.end())
         {}
 
@@ -56,19 +56,19 @@ namespace
 
 SCENARIO("Compose pipeline stages with first stage generating data")
 {
-    GIVEN("a generator")
+    GIVEN("a data source")
     {
         THEN("it is iterable")
         {
-            REQUIRE(pipeable::type::is_iterable_v<generator<int>>);
+            REQUIRE(pipeable::type::is_iterable_v<data_source<int>>);
         }
 
-        my_generator<int> myGenerator = { 1, 2, 3 };
+        my_source<int> dataSource = { 1, 2, 3 };
 
         WHEN("iterated")
         {
             std::vector<int> vals;
-            for (auto val : myGenerator)
+            for (auto val : dataSource)
             {
                 vals.push_back(val);
             }
@@ -81,7 +81,7 @@ SCENARIO("Compose pipeline stages with first stage generating data")
             }
         }
 
-        WHEN("piped as: generator >>= for_each >>= receiver")
+        WHEN("piped as: data_source >>= for_each >>= receiver")
         {
             std::vector<std::string> newValues;
             auto callable = [&](std::string val)
@@ -89,7 +89,7 @@ SCENARIO("Compose pipeline stages with first stage generating data")
                 newValues.push_back(val);
             };
 
-            myGenerator >>= for_each >>= int_to_int() >>= int_to_string() >>= callable;
+            dataSource >>= for_each >>= int_to_int() >>= int_to_string() >>= callable;
 
             THEN("receiver is invoked once for each element")
             {

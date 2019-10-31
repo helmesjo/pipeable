@@ -12,7 +12,7 @@ namespace pipeable
     Prefer marking derived classes as "final" to allow devirtualization.
     */
     template<typename T>
-    struct generator
+    struct data_source
     {
         virtual std::optional<T> next() = 0;
 
@@ -24,8 +24,8 @@ namespace pipeable
             using pointer = value_type const*;
             using difference_type = ptrdiff_t;
 
-            iterator(generator& gen, bool end) : 
-                generator_(gen)
+            iterator(data_source& source, bool end) :
+                source_(source)
             {
                 if (!end)
                 {
@@ -55,12 +55,12 @@ namespace pipeable
 
             iterator& operator++()
             {
-                current_ = generator_.next();
+                current_ = source_.next();
                 return *this;
             }
 
         private:
-            generator& generator_;
+            data_source& source_;
             std::optional<T> current_;
         };
 
