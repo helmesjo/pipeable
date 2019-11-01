@@ -8,18 +8,8 @@ namespace pipeable
 {
     namespace impl
     {
-        struct pipe_tag
-        {
-            // This is needed to enable lambdas in "unevaluated contexts" where we expect it to receive a callable,
-            // specifically "std::is_invocable_v<T, base::pipe_tag, args_t...>;", because
-            // if the lambda invokes the "pipe_tag type" in it's body (which is expected) it will fail the compilation.
-            // Will be fixed in C++20: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0315r4.pdf
-            template<typename T>
-            void operator()(T&&) const;
-        };
-
+        struct pipe_tag {};
         struct custom_pipeable_tag {};
-
         struct pipe_interceptor_tag {};
     }
 
