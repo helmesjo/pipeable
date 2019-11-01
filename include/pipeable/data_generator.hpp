@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pipeable/internal/pipeable_internal.hpp>
+#include <pipeable/pipeable.hpp>
 #include <functional>
 
 namespace pipeable
@@ -19,14 +19,7 @@ namespace pipeable
         {
             downstream_ = [downstream = std::forward<callable_t>(downstream)](const outputs_t&... args) mutable
             {
-                if constexpr (std::is_pointer_v<callable_t>)
-                {
-                    (*downstream)(args...);
-                }
-                else
-                {
-                    downstream(args...);
-                }
+                std::tuple(args...) >>= unpack >>= downstream;
             };
 
             return *this;
