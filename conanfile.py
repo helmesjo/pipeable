@@ -8,7 +8,7 @@ class Pipeable(ConanFile):
     description = \
         "Enables easy chaining of callable objects, automatically forwarding output as input: \n" \
         "auto result = vector{1, 2, 3} >>= for_each >>= int_to_cat >>= cat_to_hat;"
-    author = "Fred Helmesjö (helmesjo@live.com)"
+    author = "Fred Helmesjö (helmesjo@gmail.com)"
     url = "https://github.com/helmesjo/pipeable.git"
     license = "MIT"
     # No settings/options are necessary, this is header only
