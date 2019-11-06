@@ -543,9 +543,9 @@ SCENARIO("Implicit conversion")
 }
 SCENARIO("custom pipeline interceptors")
 {
-    GIVEN("an interceptor taking first arg as 'auto&& callable' and rest as expected input")
+    GIVEN("an interceptor taking first arg as 'auto&& callable' and rest as expected input, and returning tail result")
     {
-        auto interceptor = assembly::make_interceptor([](auto&& tailPipeline, int val)
+        auto interceptor = assembly::make_interceptor([](auto&& tailPipeline, int val) -> std::string
         {
             return tailPipeline(val + 1);
         });
@@ -587,6 +587,22 @@ SCENARIO("custom pipeline interceptors")
             }
         }
     }
+    GIVEN("an interceptor taking first arg as 'auto&& callable' and rest as expected input, and returning void")
+    {
+        auto interceptor = assembly::make_interceptor([](auto&& tailPipeline, int val) -> void
+        {
+            tailPipeline(val);
+        });
+
+        WHEN("a pipeline composed as: auto pipeline = int_to_int() >>= interceptor >>= interceptor >>= int_to_string()")
+        {
+            auto pipeline = int_to_int() >>= interceptor >>= interceptor >>= int_to_int() >>= int_to_string();
+            AND_WHEN("pipeline is invoked")
+            {
+                1 >>= pipeline;
+            }
+        }
+    }
 }
 SCENARIO("built in pipeline interceptors")
 {
@@ -622,7 +638,7 @@ SCENARIO("built in pipeline interceptors")
 
         auto pipeline = visit >>= &receiver;
 
-        WHEN("a variant of multiple types is piped, once while containing each time")
+        WHEN("a variant of multiple types is piped (once per type)")
         {
             std::variant<int, float, std::string> inputValues;
             inputValues = (int)1;
