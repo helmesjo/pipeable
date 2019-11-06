@@ -17,12 +17,13 @@ using pipeable::operator>>=;
 
 struct extract_number
 {
-  int operator()(string input){ ... }
+  int operator()(string input);
 };
 
 struct number_plus
 {
-  int operator()(int input){ ... }
+  number_plus(int val);
+  int operator()(int input);
 };
 
 int main(int argc, char *argv[])
@@ -51,7 +52,7 @@ auto for_each = pipeable::assembly::make_interceptor(
 
 struct print_to_stdout
 {
-  void operator()(int val) { cout << val;1 }
+  void operator()(int val) { cout << val; }
 };
 
 vector{1, 2, 3} >>= for_each >>= print_to_stdout();
@@ -62,8 +63,51 @@ vector{1, 2, 3} >>= for_each >>= print_to_stdout();
 - **[visit](https://github.com/helmesjo/pipeable/blob/bbe78f033b8b22779e4e371f8c18ef58e9ad7550/include/pipeable/pipeable.hpp#L22-L27)**: Apply the visitor pattorn (std::visit) to left-hand std::variant<...> and invoke on downstream.
 - **[unpack](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L29-L34)**: Unpack left-hand tuple and pass elements as individual arguments to downstream.
 - **[maybe](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L36-L44)**: Forward left-hand optional value to downstream if it exists, else do nothing.
+### Data Generator:
+_A callable storing other callables to-be-invoked whenever new data is generated (producer & consumer)._
 
-## Build & Install
+**TODO: Add multi register/deregister capability.**
+```
+#include <pipeable/data_generator.hpp>
+
+struct print_to_stdout
+{
+  void operator()(int val) { cout << val; }
+};
+
+data_generator<int> myGenerator;
+myGenerator >>= print_to_stdout();
+
+myGenerator(1);     // output: 1
+1 >>= myGenerator;  // output: 1
+```
+### Data Source:
+_An iterable type to be "pulled" for data until no more exists._
+```
+#include <pipeable/data_source.hpp>
+
+struct int_source final : public data_source<int>
+{
+    std::optional<int> next() override
+    {
+        return current_ < 100 ? std::optional<int>{current_++} : std::nullopt;
+    }
+    int current_ = 0;
+};
+
+struct print_to_stdout
+{
+  void operator()(int val) { cout << val; }
+};
+
+int_source mySource;
+
+mySource >>= for_each >>= print_to_stdout();
+// output: 0 ... 99
+
+```
+
+# Build & Install
 1. `mkdir build && cd build`
 2. `cmake .. && cmake --build .`
     - Run tests: `ctest`
