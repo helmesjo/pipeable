@@ -70,7 +70,7 @@ namespace pipeable
             {
             }
 
-            // If head is head & tail are callable, invoke as: head(tail(args...))
+            // If head & tail are callable, invoke as: tail(head(args...))
             template<typename... args_t, typename T = tail_t, typename H = head_t,
                 concepts::IsNotInterceptor<T> = nullptr,
                 concepts::IsNotInterceptor<H> = nullptr>
@@ -357,7 +357,14 @@ namespace pipeable
             concepts::IsNotPipe<head_t>>
         constexpr decltype(auto) invoke(head_t&& head, arg_t&& arg)
         {
-            return std::forward<head_t>(head)(invoke(std::forward<arg_t>(arg)));
+            if constexpr (std::is_pointer_v<std::decay_t<head_t>>)
+            {
+                return invoke(*std::forward<head_t>(head), std::forward<arg_t>(arg));
+            }
+            else
+            {
+                return std::forward<head_t>(head)(invoke(std::forward<arg_t>(arg)));
+            }
         }
     }
 }
