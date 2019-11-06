@@ -67,7 +67,7 @@ vector{1, 2, 3} >>= for_each >>= print_to_stdout();
 _A callable storing other callables to-be-invoked whenever new data is generated (producer & consumer)._
 
 **TODO: Add multi register/deregister capability.**
-```
+```c++
 #include <pipeable/data_generator.hpp>
 
 struct print_to_stdout
@@ -83,7 +83,7 @@ myGenerator(1);     // output: 1
 ```
 ### Data Source:
 _An iterable type to be "pulled" for data until no more exists._
-```
+```c++
 #include <pipeable/data_source.hpp>
 
 struct int_source final : public data_source<int>
