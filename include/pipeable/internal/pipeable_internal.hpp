@@ -218,6 +218,12 @@ namespace pipeable
         using pipe_result_of_t = decltype(invocation::invoke(std::declval<T>(), std::declval<args_t>()));
     }
 
+    namespace concepts
+    {
+        template<typename receiver_t, typename... args_t>
+        using IsInvocable = std::enable_if_t<meta::is_invocable_v<receiver_t, args_t...>, details::tag_t<6>>;
+    }
+
     namespace impl
     {
         // Compile time class holding all callable types, accessor (value/pointer) and qualifiers.

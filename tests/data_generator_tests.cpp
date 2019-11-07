@@ -82,3 +82,36 @@ SCENARIO("Compose pipelines with a data generator")
         }
     }
 }
+
+SCENARIO("multi-output generator")
+{
+    GIVEN("a generator outputting int & string")
+    {
+        data_generator<int, std::string> multiGenerator;
+
+        WHEN("piped to receiver callable with int")
+        {
+            int receivedInt = 0;
+            const auto receiver = [&](int val) { receivedInt = val; };
+
+            multiGenerator >>= &receiver;
+            THEN("it receives the generated int")
+            {
+                multiGenerator(1);
+                REQUIRE(receivedInt == 1);
+            }
+        }
+        WHEN("piped to receiver callable with string")
+        {
+            std::string receivedStr = "";
+            const auto receiver = [&](std::string val) { receivedStr = val; };
+
+            multiGenerator >>= &receiver;
+            THEN("it receives the generated string")
+            {
+                multiGenerator("1");
+                REQUIRE(receivedStr == "1");
+            }
+        }
+    }
+}
