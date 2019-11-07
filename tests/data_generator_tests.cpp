@@ -113,5 +113,30 @@ SCENARIO("multi-output generator")
                 REQUIRE(receivedStr == "1");
             }
         }
+
+        WHEN("piped to receiver callable with int and string")
+        {
+            struct receiver_t
+            {
+                int receivedInt = 0;
+                std::string receivedStr = "";
+                void operator()(int val) { receivedInt = val; }
+                void operator()(std::string val) { receivedStr = val; }
+                void operator()(std::tuple<>) { } // dummy
+            } receiver;
+
+            multiGenerator >>= &receiver;
+
+            THEN("it receives the generated int")
+            {
+                multiGenerator(1);
+                REQUIRE(receiver.receivedInt == 1);
+            }
+            THEN("it receives the generated string")
+            {
+                multiGenerator("1");
+                REQUIRE(receiver.receivedStr == "1");
+            }
+        }
     }
 }

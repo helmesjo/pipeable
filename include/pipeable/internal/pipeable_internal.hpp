@@ -214,6 +214,9 @@ namespace pipeable
         template<typename T, typename... args_t>
         constexpr bool is_invocable_v = meta::details::is_invocable<std::remove_pointer_t<T>, args_t...>();
 
+        template<typename callable_t, typename... args_t>
+        constexpr bool is_invocable_with_any_v = (meta::is_invocable_v<callable_t, args_t> || ...);
+
         template<typename T, typename args_t, concepts::IsPipe<T> = nullptr> // TODO: Parameter pack should work here, but automatic type deduction fails for args_t on GCC, and complains about IsPipe<T>... FIX!
         using pipe_result_of_t = decltype(invocation::invoke(std::declval<T>(), std::declval<args_t>()));
     }
@@ -222,6 +225,9 @@ namespace pipeable
     {
         template<typename receiver_t, typename... args_t>
         using IsInvocable = std::enable_if_t<meta::is_invocable_v<receiver_t, args_t...>, details::tag_t<6>>;
+
+        template<typename callable_t, typename... args_t>
+        using IsInvocableWithAny = std::enable_if_t<meta::is_invocable_with_any_v<callable_t, args_t...>, details::tag_t<7>>;
     }
 
     namespace impl
