@@ -27,7 +27,8 @@ matrix:
 
 script: >
   docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
-  "./build.sh &&
+  "pip install conan==1.20.2 &&
+  ./build.sh &&
   conan create . helmesjo/stable &&
   conan remote add repo $REMOTE_REPO &&
   conan upload '*' -r repo --confirm"
