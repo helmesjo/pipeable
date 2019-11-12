@@ -63,7 +63,7 @@ vector{1, 2, 3} >>= for_each >>= print_to_stdout();
 - **[unpack](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L29-L34)**: Unpack left-hand tuple and pass elements as individual arguments to downstream.
 - **[maybe](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L36-L44)**: Forward left-hand optional value to downstream if it exists, else do nothing.
 ### Data Generator:
-_A callable storing other callables to-be-invoked whenever new data is generated (producer & consumer)._
+_A callable storing other callables to-be-invoked whenever new data is generated (observer pattern)._
 
 **TODO: Add multi register/deregister capability.**
 ```c++
