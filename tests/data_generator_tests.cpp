@@ -37,20 +37,27 @@ SCENARIO("Compose pipelines with a data generator")
     GIVEN("a data generator")
     {
         data_generator<int> generator;
-        WHEN("it is piped to a receiver")
+        WHEN("generator is piped to receiver")
         {
             int_to_int receiver;
-            generator >>= &receiver;
+            generator += &receiver;
             THEN("no data is forwarded automatically")
             {
                 REQUIRE(receiver.receivedValue == false);
             }
-            AND_WHEN("generator is invoked with data")
+            THEN("data is forwarded to the downstream pipeline")
             {
                 generator(1);
-                THEN("it is forwarded to the downstream pipeline")
+                REQUIRE(receiver.receivedValue == true);
+            }
+            AND_WHEN("receiver is deregistered from generator")
+            {
+                generator -= &receiver;
+                THEN("data is no longer forwarded")
                 {
-                    REQUIRE(receiver.receivedValue == true);
+                    receiver.receivedValue = false;
+                    generator(1);
+                    REQUIRE(receiver.receivedValue == false);
                 }
             }
         }
@@ -59,10 +66,10 @@ SCENARIO("Compose pipelines with a data generator")
     {
         data_generator<std::variant<int, std::string>> generator;
 
-        WHEN("it is piped as: generator >>= visit >>= receiver")
+        WHEN("it is piped as: generator += visit >>= receiver")
         {
             int_and_string_receiver receiver;
-            generator >>= visit >>= &receiver;
+            generator += visit >>= &receiver;
             AND_WHEN("generator is invoked with x")
             {
                 generator(1);
@@ -94,7 +101,7 @@ SCENARIO("multi-output generator")
             int receivedInt = 0;
             const auto receiver = [&](int val) { receivedInt = val; };
 
-            multiGenerator >>= &receiver;
+            multiGenerator += &receiver;
             THEN("it receives the generated int")
             {
                 multiGenerator(1);
@@ -106,7 +113,7 @@ SCENARIO("multi-output generator")
             std::string receivedStr = "";
             const auto receiver = [&](std::string val) { receivedStr = val; };
 
-            multiGenerator >>= &receiver;
+            multiGenerator += &receiver;
             THEN("it receives the generated string")
             {
                 multiGenerator("1");
@@ -125,7 +132,7 @@ SCENARIO("multi-output generator")
                 void operator()(std::tuple<>) { } // dummy
             } receiver;
 
-            multiGenerator >>= &receiver;
+            multiGenerator += &receiver;
 
             THEN("it receives the generated int")
             {

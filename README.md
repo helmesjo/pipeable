@@ -64,8 +64,6 @@ vector{1, 2, 3} >>= for_each >>= print_to_stdout();
 - **[maybe](https://github.com/helmesjo/pipeable/blob/cc76b0ff42b36bd9021b3afad8c1b3979c6cef25/include/pipeable/pipeable.hpp#L36-L44)**: Forward left-hand optional value to downstream if it exists, else do nothing.
 ### Data Generator:
 _A callable storing other callables to-be-invoked whenever new data is generated (observer pattern)._
-
-**TODO: Add multi register/deregister capability.**
 ```c++
 #include <pipeable/data_generator.hpp>
 
@@ -75,10 +73,15 @@ struct print_to_stdout
 };
 
 data_generator<int> myGenerator;
-myGenerator >>= print_to_stdout();
+print_to_stdout receiver;
+myGenerator += &receiver;   // Register receiver
 
-myGenerator(1);     // output: 1
-1 >>= myGenerator;  // output: 1
+myGenerator(1);             // output: 1
+1 >>= myGenerator;          // output: 1
+
+myGenerator -= &receiver;   // Deregister receiver
+myGenerator(1);             // No output
+
 ```
 ### Data Source:
 _An iterable type to be "pulled" for data until no more exists._
