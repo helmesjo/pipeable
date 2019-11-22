@@ -91,13 +91,14 @@ namespace pipeable
             template<typename... args_t>
             static constexpr bool is_invocable()
             {
-                if constexpr (meta::is_interceptor_v<head_t>)
+                using head_t_ = std::remove_pointer_t<head_t>;
+                if constexpr (meta::is_interceptor_v<head_t_>)
                 {
-                    return std::is_invocable_v<head_t, tail_t, args_t...>;
+                    return std::is_invocable_v<head_t_, tail_t, args_t...>;
                 }
                 else
                 {
-                    return std::is_invocable_v<head_t, args_t...>;
+                    return std::is_invocable_v<head_t_, args_t...>;
                 }
             }
 
@@ -212,7 +213,7 @@ namespace pipeable
         }
 
         template<typename T, typename... args_t>
-        constexpr bool is_invocable_v = meta::details::is_invocable<std::remove_pointer_t<T>, args_t...>();
+        constexpr bool is_invocable_v = meta::details::is_invocable<T, args_t...>();
 
         template<typename callable_t, typename... args_t>
         constexpr bool is_invocable_with_any_v = (meta::is_invocable_v<callable_t, args_t> || ...);

@@ -23,6 +23,11 @@ namespace
         std::this_thread::sleep_for(std::chrono::microseconds{1});
     }
 
+    struct abstract_int_to_int
+    {
+        virtual int operator()(int val) = 0;
+    };
+
     struct int_to_int
     {
         int operator()(int val)
@@ -91,6 +96,13 @@ SCENARIO("Pipeline type traits")
         THEN("it is invocable with int")
         {
             REQUIRE(meta::is_invocable_v<int_to_int, int>);
+        }
+    }
+    GIVEN("an abstract callable with signature: int(int)")
+    {
+        THEN("it is invocable with int")
+        {
+            REQUIRE(meta::is_invocable_v<abstract_int_to_int*, int>);
         }
     }
     GIVEN("a callable without arguments and no return type")
