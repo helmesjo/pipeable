@@ -23,6 +23,19 @@ namespace pipeable
 
         template<typename... Ts>
         constexpr bool is_interceptor_v = (std::is_base_of_v<impl::pipe_interceptor_tag, std::decay_t<Ts>> && ...);
+
+        template<typename T>
+        constexpr decltype(auto) deref_if_ptr(T&& obj)
+        {
+            if constexpr (std::is_pointer_v<std::decay_t<T>>)
+            {
+                return *std::forward<T>(obj);
+            }
+            else
+            {
+                return std::forward<T>(obj);
+            }
+        }
     }
 
     namespace concepts
@@ -352,32 +365,14 @@ namespace pipeable
             concepts::IsNotPipe<head_t>>
         constexpr decltype(auto) invoke(tail_t&& tail, head_t&& head, rest_t&&... rest)
         {
-            if constexpr (std::is_pointer_v<std::decay_t<tail_t>>)
-            {
-                return invoke(*std::forward<tail_t>(tail), std::forward<head_t>(head), std::forward<rest_t>(rest)...);
-            }
-            else if constexpr (std::is_pointer_v<std::decay_t<head_t>>)
-            {
-                return invoke(std::forward<tail_t>(tail), *std::forward<head_t>(head), std::forward<rest_t>(rest)...);
-            }
-            else
-            {
-                return invoke(impl::invoke_pair(std::forward<tail_t>(tail), std::forward<head_t>(head)), std::forward<rest_t>(rest)...);
-            }
+            return invoke(impl::invoke_pair(meta::deref_if_ptr(std::forward<tail_t>(tail)), meta::deref_if_ptr(std::forward<head_t>(head))), std::forward<rest_t>(rest)...);
         }
 
         template<typename head_t, typename arg_t,
             concepts::IsNotPipe<head_t>>
         constexpr decltype(auto) invoke(head_t&& head, arg_t&& arg)
         {
-            if constexpr (std::is_pointer_v<std::decay_t<head_t>>)
-            {
-                return invoke(*std::forward<head_t>(head), std::forward<arg_t>(arg));
-            }
-            else
-            {
-                return std::forward<head_t>(head)(invoke(std::forward<arg_t>(arg)));
-            }
+           return meta::deref_if_ptr(std::forward<head_t>(head))(invoke(std::forward<arg_t>(arg)));
         }
     }
 }
