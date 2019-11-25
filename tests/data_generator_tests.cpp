@@ -147,3 +147,24 @@ SCENARIO("multi-output generator")
         }
     }
 }
+
+SCENARIO("Chaining generators")
+{
+    GIVEN("A generator outputting int")
+    {
+        data_generator<int> gen1;
+        WHEN("chained to another generator outputting int")
+        {
+            data_generator<int> gen2;
+            gen1 += &gen2;
+            bool didReceiveData = false;
+            auto receiver = [&](int) { didReceiveData = true; };
+            gen2 += &receiver;
+            THEN("invoking first generator will invoke second")
+            {
+                gen1(1);
+                REQUIRE(didReceiveData);
+            }
+        }
+    }
+}
