@@ -145,6 +145,26 @@ SCENARIO("multi-output generator")
                 REQUIRE(receiver.receivedStr == "1");
             }
         }
+
+        WHEN("piped to r-value receiver containing shared_ptr, callable with both int and string")
+        {
+            auto wasPtrEmpty = false;
+            multiGenerator += [&wasPtrEmpty, ptr = std::make_shared<int>()](const auto& value) mutable
+            {
+                wasPtrEmpty = ptr == nullptr;
+            };
+
+            THEN("contained shared_ptr wasn't moved from (is empty)")
+            {
+                multiGenerator(1);
+                REQUIRE(!wasPtrEmpty);
+            }
+            THEN("contained shared_ptr wasn't moved from (is empty)")
+            {
+                multiGenerator("1");
+                REQUIRE(!wasPtrEmpty);
+            }
+        }
     }
 }
 

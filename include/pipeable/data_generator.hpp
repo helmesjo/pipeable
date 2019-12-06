@@ -25,11 +25,12 @@ namespace pipeable
                 concepts::IsInvocable<callable_t, outputs_t...> = nullptr>
             void operator+=(callable_t&& downstream)
             {
-                downstream_t receiverCall = [downstream = std::forward<callable_t>(downstream)](auto&&... args) mutable
+                auto id = identifier(downstream);
+                downstream_t receiverCall = [downstream = downstream](auto&& arg) mutable
                 {
                     invocation::invoke(std::forward<callable_t>(downstream), std::forward<decltype(args)>(args)...);
                 };
-                receivers_.emplace_back(identifier(downstream), receiverCall);
+                receivers_.emplace_back(id, receiverCall);
             }
 
             template<typename callable_t,
