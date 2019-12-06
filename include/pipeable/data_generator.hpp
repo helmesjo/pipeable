@@ -8,33 +8,33 @@ namespace pipeable
 {
     namespace impl
     {
-        template<typename... outputs_t>
+        template<typename output_t>
         struct data_generator_impl : impl::custom_pipeable_tag
         {
-            using downstream_t = std::function<void(const outputs_t&...)>;
+            using downstream_t = std::function<void(const output_t&)>;
 
-            void operator()(const outputs_t&... args)
+            void operator()(const output_t& arg)
             {
                 for (auto& downstream : receivers_)
                 {
-                    downstream.second(args...);
+                    downstream.second(arg);
                 }
             }
 
             template<typename callable_t,
-                concepts::IsInvocable<callable_t, outputs_t...> = nullptr>
+                concepts::IsInvocable<callable_t, output_t> = nullptr>
             void operator+=(callable_t&& downstream)
             {
                 auto id = identifier(downstream);
                 downstream_t receiverCall = [downstream = downstream](auto&& arg) mutable
                 {
-                    invocation::invoke(std::forward<callable_t>(downstream), std::forward<decltype(args)>(args)...);
+                    invocation::invoke(std::forward<callable_t>(downstream), std::forward<decltype(arg)>(arg));
                 };
                 receivers_.emplace_back(id, receiverCall);
             }
 
             template<typename callable_t,
-                concepts::IsInvocable<callable_t, outputs_t...> = nullptr>
+                concepts::IsInvocable<callable_t, output_t> = nullptr>
             void operator-=(callable_t&& downstream)
             {
                 receivers_.erase(std::remove_if(receivers_.begin(), receivers_.end(), [addr = identifier(downstream)](auto&& receiver) {
@@ -43,8 +43,10 @@ namespace pipeable
             }
 
         private:
+            std::vector<std::pair<const void*, downstream_t>> receivers_;
+
             template<typename callable_t>
-            static constexpr const void* identifier(callable_t&& callable)
+            static constexpr const void* identifier(const callable_t& callable)
             {
                 if constexpr (std::is_pointer_v<std::decay_t<callable_t>>)
                 {
@@ -55,8 +57,6 @@ namespace pipeable
                     return nullptr;
                 }
             }
-
-            std::vector<std::pair<const void*, downstream_t>> receivers_;
         };
 
         template<typename... bases_t>
