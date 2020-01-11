@@ -25,11 +25,11 @@ matrix:
      - <<: *linux
        env: CONAN_DOCKER_IMAGE=conanio/clang9
      - <<: *osx
-      osx_image: xcode10.1
-      env: CONAN_APPLE_CLANG_VERSIONS=10.0
-    - <<: *osx
-      osx_image: xcode11
-      env: CONAN_APPLE_CLANG_VERSIONS=11.0
+       osx_image: xcode10.1
+       env: CONAN_APPLE_CLANG_VERSIONS=10.0
+     - <<: *osx
+       osx_image: xcode11
+       env: CONAN_APPLE_CLANG_VERSIONS=11.0
 script: >
  docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
  "pip install conan==1.20.2 &&
