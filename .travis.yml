@@ -1,8 +1,9 @@
 env:
   global:
-    - CONAN_LOGIN_USERNAME: helmesjo
-    - #CONAN_PASSWORD: <specify-in-ci-server>
-    - REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
+    - CONAN_USERNAME: "helmesjo"
+    - CONAN_LOGIN_USERNAME: "helmesjo"
+    - CONAN_CHANNEL: "stable"
+    - CONAN_UPLOAD: "https://api.bintray.com/conan/helmesjo/public-conan"
 
 linux: &linux
   os: linux
@@ -14,28 +15,35 @@ linux: &linux
 osx: &osx
   os: osx
   language: generic
-  services:
-    - docker
 matrix:
   include:
      - <<: *linux
-       env: CONAN_DOCKER_IMAGE=conanio/gcc8
+       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8-x86 CONAN_ARCHS=x86
      - <<: *linux
-       env: CONAN_DOCKER_IMAGE=conanio/gcc9
+       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8 CONAN_ARCHS=x86_64
      - <<: *linux
-       env: CONAN_DOCKER_IMAGE=conanio/clang8
+       env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9-x86 CONAN_ARCHS=x86
      - <<: *linux
-       env: CONAN_DOCKER_IMAGE=conanio/clang9
+       env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9 CONAN_ARCHS=x86_64
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8 CONAN_ARCHS=x86_64
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9 CONAN_ARCHS=x86_64
      - <<: *osx
        osx_image: xcode10.1
        env: CONAN_APPLE_CLANG_VERSIONS=10.0
      - <<: *osx
        osx_image: xcode11
        env: CONAN_APPLE_CLANG_VERSIONS=11.0
-script: >
- docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
- "pip install conan==1.20.2 &&
- ./build.sh &&
- conan create . helmesjo/stable &&
- conan remote add repo $REMOTE_REPO &&
- conan upload '*' -r repo --confirm"
+
+install:
+ - chmod +x .ci/install.sh
+ - ./.ci/install.sh
+
+script:
+ - chmod +x .ci/run.sh
+ - ./.ci/run.sh

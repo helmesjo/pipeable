@@ -1,25 +1,24 @@
-environment:
-  PYTHON_HOME: "C:\\Python37"
-  CONAN_LOGIN_USERNAME: helmesjo
-  #CONAN_PASSWORD: <specify-in-ci-server>
-  REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
+build: false
 
-  matrix:
-    - BUILD_TYPE: cmake
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      CONAN_VISUAL_VERSIONS: 15
-    - BUILD_TYPE: cmake
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      CONAN_VISUAL_VERSIONS: 16
+environment:
+    PYTHON: "C:\\Python37"
+
+    CONAN_USERNAME: "helmesjo"
+    CONAN_LOGIN_USERNAME: "helmesjo"
+    CONAN_CHANNEL: "stable"
+    CONAN_UPLOAD: "https://api.bintray.com/conan/helmesjo/public-conan"
+
+    matrix:
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+          CONAN_VISUAL_VERSIONS: 15
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+          CONAN_VISUAL_VERSIONS: 16
 
 install:
-  - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
+  - set PATH=%PATH%;%PYTHON%/Scripts/
   - pip.exe install conan --upgrade
+  - pip.exe install conan_package_tools bincrafters_package_tools
+  - conan user # It creates the conan data directory
 
-build_script: >
-  build.sh &&
-  conan create . helmesjo/stable &&
-  conan remote add repo %REMOTE_REPO% &&
-  conan upload "*" -r repo --confirm
-
-deploy: off
+test_script:
+  - python .ci/build.py
