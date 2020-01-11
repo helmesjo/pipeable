@@ -1,34 +1,39 @@
 env:
-   global:
-     - CONAN_LOGIN_USERNAME: helmesjo
-     - #CONAN_PASSWORD: <specify-in-ci-server>
-     - REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
+  global:
+    - CONAN_LOGIN_USERNAME: helmesjo
+    - #CONAN_PASSWORD: <specify-in-ci-server>
+    - REMOTE_REPO: "https://api.bintray.com/conan/helmesjo/public-conan"
 
 linux: &linux
-   os: linux
-   dist: bionic
-   language: python
-   python: "3.7"
-   services:
-     - docker
+  os: linux
+  dist: bionic
+  language: python
+  python: "3.7"
+  services:
+    - docker
 osx: &osx
-   os: osx
-   language: generic
+  os: osx
+  language: generic
 matrix:
-   include:
-      - <<: *linux
-        env: CONAN_DOCKER_IMAGE=conanio/gcc8
-      - <<: *linux
-        env: CONAN_DOCKER_IMAGE=conanio/gcc9
-      - <<: *linux
-        env: CONAN_DOCKER_IMAGE=conanio/clang8
-      - <<: *linux
-        env: CONAN_DOCKER_IMAGE=conanio/clang9
-
+  include:
+     - <<: *linux
+       env: CONAN_DOCKER_IMAGE=conanio/gcc8
+     - <<: *linux
+       env: CONAN_DOCKER_IMAGE=conanio/gcc9
+     - <<: *linux
+       env: CONAN_DOCKER_IMAGE=conanio/clang8
+     - <<: *linux
+       env: CONAN_DOCKER_IMAGE=conanio/clang9
+     - <<: *osx
+      osx_image: xcode10.1
+      env: CONAN_APPLE_CLANG_VERSIONS=10.0
+    - <<: *osx
+      osx_image: xcode11
+      env: CONAN_APPLE_CLANG_VERSIONS=11.0
 script: >
-  docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
-  "pip install conan==1.20.2 &&
-  ./build.sh &&
-  conan create . helmesjo/stable &&
-  conan remote add repo $REMOTE_REPO &&
-  conan upload '*' -r repo --confirm"
+ docker run --rm --volume $(pwd):/source --workdir /source $CONAN_DOCKER_IMAGE sh -c
+ "pip install conan==1.20.2 &&
+ ./build.sh &&
+ conan create . helmesjo/stable &&
+ conan remote add repo $REMOTE_REPO &&
+ conan upload '*' -r repo --confirm"
