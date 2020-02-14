@@ -14,8 +14,8 @@ namespace pipeable
         // Iterate with universal reference, and perfectly forward to downstream pipeline
         for(auto&& elem : iterable)
         {
-            std::forward<decltype(downstream)>(downstream)(
-                std::forward<decltype(elem)>(elem));
+            FWD(downstream)(
+                FWD(elem));
         }
     });
 
@@ -23,14 +23,14 @@ namespace pipeable
     inline const auto visit = assembly::make_interceptor(
         [](auto&& downstream, auto&& variant)
     {
-        std::visit(std::forward<decltype(downstream)>(downstream), std::forward<decltype(variant)>(variant));
+        std::visit(FWD(downstream), FWD(variant));
     });
 
     /* UNPACK */
     inline const auto unpack = assembly::make_interceptor(
         [](auto&& downstream, auto&& tuple)
     {
-        std::apply(std::forward<decltype(downstream)>(downstream), std::forward<decltype(tuple)>(tuple));
+        std::apply(FWD(downstream), FWD(tuple));
     });
 
     /* MAYBE */
@@ -39,7 +39,7 @@ namespace pipeable
     {
         if (optional)
         {
-            std::forward<decltype(downstream)>(downstream)(*optional);
+            FWD(downstream)(*optional);
         }
     });
 
@@ -53,11 +53,11 @@ namespace pipeable
     {
         if constexpr (meta::is_invocable_v<rhs_t, lhs_t>)
         {
-            return invocation::invoke(std::forward<rhs_t>(rhs), std::forward<lhs_t>(lhs));
+            return invocation::invoke(FWD(rhs), FWD(lhs));
         }
         else
         {
-            return assembly::compose(std::forward<lhs_t>(lhs), std::forward<rhs_t>(rhs));
+            return assembly::compose(FWD(lhs), FWD(rhs));
         }
     }
 }

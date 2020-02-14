@@ -28,7 +28,7 @@ namespace pipeable
                 auto id = identifier(downstream);
                 downstream_t receiverCall = [downstream = downstream](auto&& arg) mutable
                 {
-                    invocation::invoke(std::forward<callable_t>(downstream), std::forward<decltype(arg)>(arg));
+                    invocation::invoke(FWD(downstream), FWD(arg));
                 };
                 receivers_.emplace_back(id, receiverCall);
             }
@@ -77,9 +77,9 @@ namespace pipeable
         {
             // Recursively call += for each output type to find exact base/data_generator
             auto callback = [](auto&& base, auto&& downstream){
-                base->operator+=(std::forward<decltype(downstream)>(downstream));
+                base->operator+=(FWD(downstream));
             };
-            do_for_each_matching_generator<callable_t, outputs_t...>(std::forward<callable_t>(downstream), callback);
+            do_for_each_matching_generator<callable_t, outputs_t...>(FWD(downstream), callback);
         }
 
         template<typename callable_t,
@@ -89,9 +89,9 @@ namespace pipeable
             // Recursively call -= for each output type to find exact base/data_generator
             auto callback = [](auto&& base, auto&& downstream)
             {
-                base->operator-=(std::forward<decltype(downstream)>(downstream));
+                base->operator-=(FWD(downstream));
             };
-            do_for_each_matching_generator<callable_t, outputs_t...>(std::forward<callable_t>(downstream), callback);
+            do_for_each_matching_generator<callable_t, outputs_t...>(FWD(downstream), callback);
         }
 
     private:
@@ -103,16 +103,16 @@ namespace pipeable
             {
                 // Explicitly call correct base to avoid ambiguity
                 using exact_base_t = impl::data_generator_impl<output_t>;
-                callback(static_cast<exact_base_t*>(this), std::forward<callable_t>(downstream));
+                callback(static_cast<exact_base_t*>(this), FWD(downstream));
             }
         }
 
         template<typename callable_t, typename output_t, typename tail_t, typename... tails_t, typename callback_t>
         void do_for_each_matching_generator(callable_t&& downstream, callback_t&& callback)
         {
-            do_for_each_matching_generator<callable_t, output_t>(std::forward<callable_t>(downstream), std::forward<callback_t>(callback));
+            do_for_each_matching_generator<callable_t, output_t>(FWD(downstream), FWD(callback));
             // Recursively register callable for each (matching) output type
-            do_for_each_matching_generator<callable_t, tail_t, tails_t...>(std::forward<callable_t>(downstream), std::forward<callback_t>(callback));
+            do_for_each_matching_generator<callable_t, tail_t, tails_t...>(FWD(downstream), FWD(callback));
         }
     };
 }

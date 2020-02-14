@@ -4,6 +4,8 @@
 #include <tuple>
 #include <utility>
 
+#define FWD(...) ::std::forward<decltype(__VA_ARGS__)>(__VA_ARGS__)
+
 namespace pipeable
 {
     namespace impl
@@ -29,11 +31,11 @@ namespace pipeable
         {
             if constexpr (std::is_pointer_v<std::decay_t<T>>)
             {
-                return *std::forward<T>(obj);
+                return *FWD(obj);
             }
             else
             {
-                return std::forward<T>(obj);
+                return FWD(obj);
             }
         }
     }
@@ -78,8 +80,8 @@ namespace pipeable
         {
             template<typename T1, typename T2>
             invoke_pair(T1&& tail, T2&& head) :
-                tail(std::forward<T1>(tail)),
-                head(std::forward<T2>(head))
+                tail(FWD(tail)),
+                head(FWD(head))
             {
             }
 
@@ -89,7 +91,7 @@ namespace pipeable
                 concepts::IsNotInterceptor<H> = nullptr>
             decltype(auto) operator()(args_t&&... args)
             {
-                return tail(head(std::forward<args_t>(args)...));
+                return tail(head(FWD(args)...));
             }
 
             // If head is interceptor & tail is callable, invoke as: interceptor(tail, args...)
@@ -98,7 +100,7 @@ namespace pipeable
                 concepts::IsNotInterceptor<T> = nullptr>
             decltype(auto) operator()(args_t&&... args)
             {
-                return head(tail, std::forward<args_t>(args)...);
+                return head(tail, FWD(args)...);
             }
 
             template<typename... args_t>
@@ -138,11 +140,11 @@ namespace pipeable
         {
             if constexpr (std::is_invocable_v<decltype(arg)>)
             {
-                return std::forward<arg_t>(arg)();
+                return FWD(arg)();
             }
             else
             {
-                return std::forward<arg_t>(arg);
+                return FWD(arg);
             }
         }
 
@@ -160,14 +162,14 @@ namespace pipeable
         inline constexpr decltype(auto) invoke(composite_t&& pipe, std::index_sequence<indexes...>, args_t&&... args)
         {
             // Reverse order to get tail...head which will be composed to: tail(...(head(args)));
-            return invoke(std::get<(sizeof...(indexes) - 1 - indexes)>(std::forward<composite_t>(pipe).callables)..., std::forward<args_t>(args)...);
+            return invoke(std::get<(sizeof...(indexes) - 1 - indexes)>(FWD(pipe).callables)..., FWD(args)...);
         }
 
         template<typename composite_t, typename... args_t, 
             concepts::IsPipe<composite_t> = nullptr>
         inline constexpr decltype(auto) invoke(composite_t&& pipe, args_t&&... args)
         {
-            return invoke(std::forward<composite_t>(pipe), make_index_sequence(std::forward<composite_t>(pipe).callables), std::forward<args_t>(args)...);
+            return invoke(FWD(pipe), make_index_sequence(FWD(pipe).callables), FWD(args)...);
         }
     }
 
@@ -261,7 +263,7 @@ namespace pipeable
 
             template<typename... Ts, concepts::IsNotPipe<Ts...> = nullptr>
             composite_pipe(Ts&&... callables) :
-                callables(std::forward<Ts>(callables)...)
+                callables(FWD(callables)...)
             {
             }
             composite_pipe() = default;
@@ -273,7 +275,7 @@ namespace pipeable
             {
                 return [pipe = *this](auto&&... args)
                 {
-                    return invocation::invoke(pipe, std::forward<decltype(args)>(args)...);
+                    return invocation::invoke(pipe, FWD(args)...);
                 };
             }
 
@@ -301,19 +303,19 @@ namespace pipeable
         template<typename head_t, std::size_t... head_indexes, typename callable_t>
         inline constexpr decltype(auto) compose(head_t&& head, std::index_sequence<head_indexes...>, callable_t&& tail)
         {
-            return impl::composite_pipe(std::get<head_indexes>(std::forward<decltype(head)>(head).callables)..., tail);
+            return impl::composite_pipe(std::get<head_indexes>(FWD(head).callables)..., tail);
         }
 
         template<typename callable_t, typename tail_t, std::size_t... tail_indexes>
         inline constexpr decltype(auto) compose(callable_t&& head, tail_t&& tail, std::index_sequence<tail_indexes...>)
         {
-            return impl::composite_pipe(std::forward<callable_t>(head), std::get<tail_indexes>(std::forward<decltype(tail)>(tail).callables)...);
+            return impl::composite_pipe(FWD(head), std::get<tail_indexes>(FWD(tail).callables)...);
         }
 
         template<typename head_t, std::size_t... head_indexes, typename tail_t, std::size_t... tail_indexes>
         inline constexpr decltype(auto) compose(head_t&& head, std::index_sequence<head_indexes...>, tail_t&& tail, std::index_sequence<tail_indexes...>)
         {
-            return impl::composite_pipe(std::get<head_indexes>(std::forward<decltype(head)>(head).callables)..., std::get<tail_indexes>(std::forward<decltype(tail)>(tail).callables)...);
+            return impl::composite_pipe(std::get<head_indexes>(FWD(head).callables)..., std::get<tail_indexes>(FWD(tail).callables)...);
         }
 
         template<typename head_t, typename tail_t>
@@ -322,29 +324,29 @@ namespace pipeable
             // Callable -> Callable
             if constexpr (!meta::is_pipe_v<head_t> && !meta::is_pipe_v<tail_t>)
             {
-                return impl::composite_pipe(std::forward<head_t>(head), std::forward<tail_t>(tail));
+                return impl::composite_pipe(FWD(head), FWD(tail));
             }
             // Callable -> Pipe
             else if constexpr (!meta::is_pipe_v<head_t> && meta::is_pipe_v<tail_t>)
             {
-                return compose(std::forward<head_t>(head), std::forward<tail_t>(tail), invocation::make_index_sequence(tail.callables));
+                return compose(FWD(head), FWD(tail), invocation::make_index_sequence(tail.callables));
             }
             // Pipe -> Callable
             else if constexpr (meta::is_pipe_v<head_t> && !meta::is_pipe_v<tail_t>)
             {
-                return compose(std::forward<head_t>(head), invocation::make_index_sequence(head.callables), std::forward<tail_t>(tail));
+                return compose(FWD(head), invocation::make_index_sequence(head.callables), FWD(tail));
             }
             // Pipe -> Pipe
             else if constexpr (meta::is_pipe_v<head_t> && meta::is_pipe_v<tail_t>)
             {
-                return compose(std::forward<head_t>(head), invocation::make_index_sequence(head.callables), std::forward<tail_t>(tail), invocation::make_index_sequence(tail.callables));
+                return compose(FWD(head), invocation::make_index_sequence(head.callables), FWD(tail), invocation::make_index_sequence(tail.callables));
             }
         }
 
         template<typename head_t, typename tail_t, typename... tails_t>
         constexpr decltype(auto) compose(head_t&& head, tail_t&& tail, tails_t&&... tails)
         {
-            return compose(compose(std::forward<head_t>(head), std::forward<tail_t>(tail)), std::forward<tails_t>(tails)...);
+            return compose(compose(FWD(head), FWD(tail)), FWD(tails)...);
         }
 
         template<typename callable_t>
@@ -365,14 +367,14 @@ namespace pipeable
             concepts::IsNotPipe<head_t>>
         constexpr decltype(auto) invoke(tail_t&& tail, head_t&& head, rest_t&&... rest)
         {
-            return invoke(impl::invoke_pair(meta::deref_if_ptr(std::forward<tail_t>(tail)), meta::deref_if_ptr(std::forward<head_t>(head))), std::forward<rest_t>(rest)...);
+            return invoke(impl::invoke_pair(meta::deref_if_ptr(FWD(tail)), meta::deref_if_ptr(FWD(head))), FWD(rest)...);
         }
 
         template<typename head_t, typename arg_t,
             concepts::IsNotPipe<head_t>>
         constexpr decltype(auto) invoke(head_t&& head, arg_t&& arg)
         {
-           return meta::deref_if_ptr(std::forward<head_t>(head))(invoke(std::forward<arg_t>(arg)));
+           return meta::deref_if_ptr(FWD(head))(invoke(FWD(arg)));
         }
     }
 }
