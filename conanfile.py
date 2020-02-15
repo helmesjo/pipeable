@@ -22,7 +22,7 @@ class Pipeable(ConanFile):
     }
 
     def build(self):
-        cmake = CMake(self)
+        cmake = CMake(self, set_cmake_flags=True)
         cmake.definitions["PIPEABLE_BUILD_TESTS"] = self.options.build_tests
         cmake.configure()
         cmake.build()
