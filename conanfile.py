@@ -1,6 +1,7 @@
 # coding=utf8
 
-from conans import ConanFile
+from conans import ConanFile, CMake
+import tempfile
 
 class Pipeable(ConanFile):
     name = "pipeable"
@@ -8,14 +9,28 @@ class Pipeable(ConanFile):
     description = \
         "Enables easy chaining of callable objects, automatically forwarding output as input: \n" \
         "auto result = vector{1, 2, 3} >>= for_each >>= int_to_cat >>= cat_to_hat;"
-    author = "Fred Helmesjö (helmesjo@gmail.com)"
+    author = "Fred Helmesjö <helmesjo@gmail.com>"
     url = "https://github.com/helmesjo/pipeable.git"
     license = "MIT"
-    # No settings/options are necessary, this is header only
-    exports_sources = "include/*", "LICENSE", "README.*"
-    no_copy_source = True
+    exports_sources = "*", "LICENSE", "README.*"
+
+    options = {
+        "build_tests": [True, False]
+    }
+    default_options = {
+        "build_tests": True
+    }
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.definitions["PIPEABLE_BUILD_TESTS"] = self.options.build_tests
+        cmake.configure()
+        cmake.build()
+
+        if self.options.build_tests:
+            cmake.test()
 
     def package(self):
-        self.copy("*.hpp")
+        self.copy("include/*.hpp")
     def package_id(self):
         self.info.header_only()

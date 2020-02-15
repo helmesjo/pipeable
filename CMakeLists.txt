@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
+option(PIPEABLE_BUILD_TESTS "Build tests" OFF)
+
 project(pipeable)
 
 add_library( ${PROJECT_NAME} INTERFACE)
@@ -31,21 +33,23 @@ export(
     FILE ${PROJECT_NAME}-config.cmake
 )
 
-# ----------- TESTS -----------
-enable_testing()
+if(PIPEABLE_BUILD_TESTS)
+    # ----------- TESTS -----------
+    enable_testing()
 
-add_subdirectory(catch2)
+    add_subdirectory(catch2)
 
-add_executable( pipeable_tests
-    "tests/pipeable_tests.cpp"
-    "tests/data_source_tests.cpp"
-    "tests/data_generator_tests.cpp"
-)
-target_link_libraries( pipeable_tests
-    pipeable
-    catch2
-)
-add_test(
-    NAME pipeable_tests
-    COMMAND pipeable_tests
-)
+    add_executable( pipeable_tests
+        "tests/pipeable_tests.cpp"
+        "tests/data_source_tests.cpp"
+        "tests/data_generator_tests.cpp"
+    )
+    target_link_libraries( pipeable_tests
+        pipeable
+        catch2
+    )
+    add_test(
+        NAME pipeable_tests
+        COMMAND pipeable_tests
+    )
+endif()
