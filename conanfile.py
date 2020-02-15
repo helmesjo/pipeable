@@ -12,8 +12,9 @@ class Pipeable(ConanFile):
     author = "Fred Helmesjö <helmesjo@gmail.com>"
     url = "https://github.com/helmesjo/pipeable.git"
     license = "MIT"
-    exports_sources = "*", "LICENSE", "README.*"
+    exports_sources = "*", "!build", "LICENSE", "README.*"
 
+    settings = "os", "arch", "compiler", "build_type"
     options = {
         "build_tests": [True, False]
     }
@@ -24,11 +25,11 @@ class Pipeable(ConanFile):
     def build(self):
         cmake = CMake(self, set_cmake_flags=True)
         cmake.definitions["PIPEABLE_BUILD_TESTS"] = self.options.build_tests
-        cmake.configure()
-        cmake.build()
+        cmake.configure(build_dir="build")
+        cmake.build(build_dir="build")
 
         if self.options.build_tests:
-            cmake.test()
+            cmake.test(build_dir="build")
 
     def package(self):
         self.copy("include/*.hpp")
