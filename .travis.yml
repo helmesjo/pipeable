@@ -18,7 +18,27 @@ osx: &osx
 matrix:
   include:
      - <<: *linux
-       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
+       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8 CONAN_ARCHS=x86_64
+     - <<: *linux
+       env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9 CONAN_ARCHS=x86_64
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8 CONAN_ARCHS=x86_64
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9-x86 CONAN_ARCHS=x86
+     - <<: *linux
+       env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9 CONAN_ARCHS=x86_64
+     - <<: *osx
+       osx_image: xcode10.1
+       env: CONAN_APPLE_CLANG_VERSIONS=10.0
+     - <<: *osx
+       osx_image: xcode11
+       env: CONAN_APPLE_CLANG_VERSIONS=11.0
 
 install:
  - chmod +x .ci/install.sh
