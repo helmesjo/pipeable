@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 option(PIPEABLE_BUILD_TESTS "Build tests" OFF)
 
-project(pipeable)
+project(pipeable CXX)
 
 add_library( ${PROJECT_NAME} INTERFACE)
 add_library(fho::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
