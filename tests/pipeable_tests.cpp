@@ -105,6 +105,14 @@ SCENARIO("Pipeline type traits")
             REQUIRE(meta::is_invocable_v<abstract_int_to_int*, int>);
         }
     }
+    GIVEN("a callable with signature: int(int&)")
+    {
+        constexpr auto callable_with_non_const_ref_arg = [](int&) { return int(); };
+        THEN("it is invocable with int&")
+        {
+            REQUIRE(meta::is_invocable_v<decltype(callable_with_non_const_ref_arg), int&>);
+        }
+    }
     GIVEN("a callable without arguments and no return type")
     {
         constexpr auto no_arg_no_return_callable = []() {};

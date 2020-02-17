@@ -6,18 +6,26 @@
 
 namespace pipeable
 {
+    namespace concepts
+    {
+        template<typename from_t, typename to_t>
+        using IsConvertible = std::enable_if_t<std::is_convertible_v<from_t, to_t>, details::tag_t<0>>;
+    }
+
     namespace impl
     {
         template<typename output_t>
         struct data_generator_impl : impl::custom_pipeable_tag
         {
-            using downstream_t = std::function<void(const output_t&)>;
+            using downstream_t = std::function<void(output_t)>;
 
-            void operator()(const output_t& arg)
+            template<typename arg_t,
+                concepts::IsConvertible<arg_t, output_t> = nullptr>
+            void operator()(arg_t&& arg) const
             {
                 for (auto& downstream : receivers_)
                 {
-                    downstream.second(arg);
+                    downstream.second(FWD(arg));
                 }
             }
 

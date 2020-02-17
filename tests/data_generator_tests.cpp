@@ -90,6 +90,30 @@ SCENARIO("Compose pipelines with a data generator")
     }
 }
 
+SCENARIO("Non const reference output generator")
+{
+    GIVEN("a data generator outputting non-const reference")
+    {
+        data_generator<int&> generator;
+        WHEN("piped to receiver callable with non const reference")
+        {
+            struct receiver_t
+            {
+                void operator()(int& mutableVal) { mutableVal = 10; }
+            } mutatingReceiver;
+
+            generator += &mutatingReceiver;
+
+            THEN("it receives the generated int")
+            {
+                int mutableInt = 1;
+                generator(mutableInt);
+                REQUIRE(mutableInt == 10);
+            }
+        }
+    }
+}
+
 SCENARIO("multi-output generator")
 {
     GIVEN("a generator outputting int & string")
