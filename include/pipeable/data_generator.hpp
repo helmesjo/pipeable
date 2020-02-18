@@ -25,7 +25,16 @@ namespace pipeable
             {
                 for (auto& downstream : receivers_)
                 {
-                    downstream.second(FWD(arg));
+                    if constexpr (std::is_rvalue_reference_v<output_t>)
+                    {
+                        downstream.second(FWD(arg));
+                    }
+                    else
+                    {
+                        // Intentionally don't forward here, since if we have multiple receivers and the value is "moved from" 
+                        // into the first, remaining receivers will (if it can be moved from) not get the value.
+                        downstream.second(arg);
+                    }
                 }
             }
 

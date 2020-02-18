@@ -95,7 +95,7 @@ SCENARIO("Non const reference output generator")
     GIVEN("a data generator outputting non-const reference")
     {
         data_generator<int&> generator;
-        WHEN("piped to receiver callable with non const reference")
+        WHEN("piped to receiver with non const reference")
         {
             struct receiver_t
             {
@@ -109,6 +109,105 @@ SCENARIO("Non const reference output generator")
                 int mutableInt = 1;
                 generator(mutableInt);
                 REQUIRE(mutableInt == 10);
+            }
+        }
+    }
+}
+
+SCENARIO("By value output generator")
+{
+    // These test is important to verify it works with input that can be MOVED FROM. We still want both receivers to receive the value.
+    GIVEN("a data generator outputting by value")
+    {
+        data_generator<int, std::string> generator;
+        WHEN("piped to multiple receivers accepting r-value reference")
+        {
+            struct receiver_t
+            {
+                int receivedInt = 0;
+                std::string receivedString;
+                void operator()(int&& val) { receivedInt = val; }
+                void operator()(std::string&& val) { receivedString = val; }
+            } receiver1, receiver2;
+
+            generator += &receiver1;
+            generator += &receiver2;
+
+            THEN("they receives the generated int")
+            {
+                generator(1);
+                REQUIRE(receiver1.receivedInt == 1);
+                REQUIRE(receiver2.receivedInt == 1);
+            }
+            THEN("they receives the generated string")
+            {
+                generator(std::string("dummy"));
+                REQUIRE(receiver1.receivedString == "dummy");
+                REQUIRE(receiver2.receivedString == "dummy");
+            }
+        }
+    }
+}
+
+SCENARIO("By r-value output generator")
+{
+    // These tests are important to verify it works as expected with input that can be MOVED FROM. Only first receiver should receive the value.
+    GIVEN("a data generator outputting by r-value")
+    {
+        data_generator<int&&, std::string&&> generator;
+        WHEN("piped to multiple receivers accepting r-value reference")
+        {
+            struct receiver_t
+            {
+                int receivedInt = 0;
+                std::string receivedString;
+                void operator()(int&& val) { receivedInt = val; }
+                void operator()(std::string&& val) { receivedString = std::move(val); }
+            } receiver1, receiver2;
+
+            generator += &receiver1;
+            generator += &receiver2;
+
+            THEN("they receive the generated int (it can't be moved from)")
+            {
+                generator(1);
+                REQUIRE(receiver1.receivedInt == 1);
+                REQUIRE(receiver2.receivedInt == 1);
+            }
+            THEN("only one receives the generated string")
+            {
+                generator(std::string("dummy"));
+                REQUIRE(receiver1.receivedString == "dummy");
+                REQUIRE(receiver2.receivedString == "");
+            }
+        }
+
+        WHEN("piped to multiple receivers accepting by value")
+        {
+            struct receiver_t
+            {
+                int receivedInt = 0;
+                std::string receivedString;
+                void operator()(int val) { receivedInt = val; }
+                void operator()(std::string val) { receivedString = val; }
+            } receiver1, receiver2;
+
+            generator += &receiver1;
+            generator += &receiver2;
+
+            THEN("they receive the generated int (it can't be moved from)")
+            {
+                generator(1);
+                REQUIRE(receiver1.receivedInt == 1);
+                REQUIRE(receiver2.receivedInt == 1);
+            }
+            // This test is important to verify it works as expected with input that can be MOVED FROM.
+            THEN("only one receives the generated string")
+            {
+                generator(std::string("dummy"));
+                REQUIRE(receiver1.receivedString == "dummy");
+                // It has been moved from
+                REQUIRE(receiver2.receivedString == "");
             }
         }
     }

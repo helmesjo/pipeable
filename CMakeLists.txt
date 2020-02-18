@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-option(PIPEABLE_BUILD_TESTS "Build tests" OFF)
+option(PIPEABLE_BUILD_TESTS "Build tests" ON)
 
 project(pipeable CXX)
 
