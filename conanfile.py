@@ -5,7 +5,7 @@ import tempfile
 
 class Pipeable(ConanFile):
     name = "pipeable"
-    version = "0.1"
+    version = "0.2"
     description = \
         "Enables easy chaining of callable objects, automatically forwarding output as input: \n" \
         "auto result = vector{1, 2, 3} >>= for_each >>= int_to_cat >>= cat_to_hat;"
