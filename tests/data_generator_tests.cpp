@@ -1,4 +1,3 @@
-#include <pipeable/pipeable.hpp>
 #include <pipeable/data_generator.hpp>
 
 #include <catch2/catch.hpp>

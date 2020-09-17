@@ -34,7 +34,9 @@ export(
 )
 
 if(PIPEABLE_BUILD_TESTS)
-    # ----------- TESTS -----------
+
+    find_package(Threads REQUIRED)
+
     enable_testing()
 
     add_subdirectory(catch2)
@@ -43,10 +45,12 @@ if(PIPEABLE_BUILD_TESTS)
         "tests/pipeable_tests.cpp"
         "tests/data_source_tests.cpp"
         "tests/data_generator_tests.cpp"
+        "tests/guarded_data_generator_tests.cpp"
     )
     target_link_libraries( pipeable_tests
         pipeable
         catch2
+        Threads::Threads
     )
     add_test(
         NAME pipeable_tests
