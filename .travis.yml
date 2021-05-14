@@ -1,7 +1,6 @@
 env:
   global:
     - CONAN_CHANNEL: "stable"
-    - CONAN_UPLOAD: "https://helmesjo.jfrog.io/artifactory/public-conan"
 
 linux: &linux
   os: linux
