@@ -18,4 +18,5 @@ install:
   - conan user # It creates the conan data directory
 
 test_script:
+  - "%PYTHON%/python.exe --version"
   - "%PYTHON%/python.exe .ci/build.py"
