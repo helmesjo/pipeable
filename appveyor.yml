@@ -1,12 +1,10 @@
 build: false
 
 environment:
-    PYTHON: "C:\\Python37"
-
-    CONAN_USERNAME: "helmesjo"
-    CONAN_LOGIN_USERNAME: "helmesjo"
     CONAN_CHANNEL: "stable"
-    CONAN_UPLOAD: "https://api.bintray.com/conan/helmesjo/public-conan"
+    CONAN_UPLOAD: "https://helmesjo.jfrog.io/artifactory/public-conan"
+
+    PYTHON: "C:\\Python37"
 
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
