@@ -15,19 +15,13 @@ osx: &osx
 matrix:
   include:
      - <<: *linux
-       env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8-x86 CONAN_ARCHS=x86
-     - <<: *linux
        env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8 CONAN_ARCHS=x86_64
-     - <<: *linux
-       env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9-x86 CONAN_ARCHS=x86
      - <<: *linux
        env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9 CONAN_ARCHS=x86_64
      - <<: *linux
-       env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8-x86 CONAN_ARCHS=x86
+       env: CONAN_GCC_VERSIONS=10 CONAN_DOCKER_IMAGE=conanio/gcc10 CONAN_ARCHS=x86_64
      - <<: *linux
        env: CONAN_CLANG_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/clang8 CONAN_ARCHS=x86_64
-     - <<: *linux
-       env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9-x86 CONAN_ARCHS=x86
      - <<: *linux
        env: CONAN_CLANG_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/clang9 CONAN_ARCHS=x86_64
      - <<: *osx
