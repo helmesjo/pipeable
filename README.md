@@ -110,7 +110,11 @@ mySource >>= for_each >>= print_to_stdout();
 ```
 
 # Build & Install
+## From source:
 1. `mkdir build && cd build`
 2. `cmake .. && cmake --build .`
     - Run tests: `ctest`
 3. `cmake --build . --target install`
+## From conan:
+* Name: `pipeable/0.2@helmesjo/stable`
+* Repo: `https://helmesjo.jfrog.io/artifactory/api/conan/public-conan`
